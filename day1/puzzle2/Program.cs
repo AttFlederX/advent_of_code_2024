@@ -1,21 +1,10 @@
 ﻿var lines = File.ReadAllLines("input.txt").Select(line => line.Split("   "));
+var parseFunc = (int i) => lines.Select(line => int.Parse(line[i])).ToList();
 
-var leftList = lines.Select(line => int.Parse(line[0])).Order().ToList();
-var rightList = lines.Select(line => int.Parse(line[1])).Order().ToList();
+var leftList = parseFunc(0);
+var rightList = parseFunc(1);
 
-var similarity = 0;
-var freqMap = new Dictionary<int, int>();
-
-foreach (var lv in leftList)
-{
-    if (freqMap.TryGetValue(lv, out int freq)) {
-        similarity += lv * freq;
-    } else {
-        var lvFreq = rightList.Count(rv => rv == lv);
-        similarity += lv * lvFreq;
-
-        freqMap[lv] = lvFreq;
-    }
-}
+var freqMap = rightList.GroupBy(rv => rv).ToDictionary(g => g.Key, g => g.Count());
+var similarity = leftList.Select(lv => lv * freqMap.GetValueOrDefault(lv)).Sum();
 
 Console.WriteLine(similarity);
