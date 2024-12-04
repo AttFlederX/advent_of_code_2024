@@ -17,7 +17,7 @@ for (int i = 0; i < mtx.Length; i++)
 
 var duration = DateTime.Now - start;
 Console.WriteLine(res);
-Console.WriteLine($"Time: {duration.Milliseconds} ms");
+Console.WriteLine($"Time: {duration.TotalMilliseconds} ms");
 
 
 int FindMatchesForCell(int i, int j)
