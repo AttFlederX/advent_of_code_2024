@@ -1,8 +1,8 @@
 ﻿var lines = File.ReadAllLines("input.txt");
-
 var start = DateTime.Now;
-var mtx = lines.Select(l => l.ToCharArray()).ToArray();
 var res = 0;
+
+var mtx = lines.Select(l => l.ToCharArray()).ToArray();
 
 for (int i = 0; i < mtx.Length; i++)
 {
