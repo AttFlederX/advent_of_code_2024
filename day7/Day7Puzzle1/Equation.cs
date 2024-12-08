@@ -1,5 +1,8 @@
 class Equation
 {
+    private static readonly string[] operators = ["+", "*"];
+    private static readonly int operatorOptions = operators.Length;
+
     public long Result { get; private set; }
     private int[] _operands;
 
@@ -8,40 +11,39 @@ class Equation
         var splitEq = lines.Split(": ");
 
         Result = long.Parse(splitEq.First());
-        _operands = splitEq.Last().Split(" ").Select(op => int.Parse(op)).ToArray();
+        _operands = splitEq.Last().Split(" ").Select(int.Parse).ToArray();
     }
 
     public bool Validate()
     {
-        var perms = GeneratePermutations();
         return GeneratePermutations().Any(perm => CalculateForPermutation(perm) == Result);
     }
 
-    private char[][] GeneratePermutations()
+    private string[][] GeneratePermutations()
     {
-        var ops = _operands.Length - 1;
-        var num = (int)Math.Pow(2, ops);
-        var perms = new char[num][];
+        var numOfOperators = _operands.Length - 1;
+        var num = (int)Math.Pow(operatorOptions, numOfOperators);
+        var perms = new string[num][];
 
         for (int i = 0; i < num; i++)
         {
-            perms[i] = new char[ops];
-            for (int j = 0; j < ops; j++)
+            perms[i] = new string[numOfOperators];
+            for (int j = 0; j < numOfOperators; j++)
             {
-                var opIdx = i / (int)Math.Pow(2, j) % 2;
-                perms[i][j] = opIdx == 1 ? '*' : '+';
+                var opIdx = i / (int)Math.Pow(operatorOptions, j) % operatorOptions;
+                perms[i][j] = operators[opIdx];
             }
         }
 
         return perms;
     }
 
-    private long CalculateForPermutation(char[] permutation)
+    private long CalculateForPermutation(string[] permutation)
     {
         long res = _operands.First();
         for (int i = 0; i < _operands.Length - 1; i++)
         {
-            if (permutation[i] == '+')
+            if (permutation[i] == "+")
             {
                 res += _operands[i + 1];
             }

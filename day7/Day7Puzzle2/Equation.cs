@@ -11,7 +11,7 @@ class Equation
         var splitEq = lines.Split(": ");
 
         Result = long.Parse(splitEq.First());
-        _operands = splitEq.Last().Split(" ").Select(op => int.Parse(op)).ToArray();
+        _operands = splitEq.Last().Split(" ").Select(int.Parse).ToArray();
     }
 
     public bool Validate()
