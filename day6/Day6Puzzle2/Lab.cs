@@ -4,7 +4,7 @@ class Lab
 {
     private int _mapSize;
     private GuardLocation _initialGuardLocation;
-    private List<ObstacleLocation> _obstacles = new();
+    private HashSet<ObstacleLocation> _obstacles = new();
 
     public Lab(IEnumerable<string> lines)
     {
@@ -34,10 +34,10 @@ class Lab
 
     public bool TestObstacle(ObstacleLocation obstacle)
     {
-        return FindGuardPath([.. _obstacles, obstacle]) == null;
+        return CheckForLoop([.. _obstacles, obstacle]);
     }
 
-    private List<GuardLocation>? FindGuardPath(List<ObstacleLocation> obstacles)
+    private List<GuardLocation>? FindGuardPath(HashSet<ObstacleLocation> obstacles)
     {
         List<GuardLocation> guardPath = [
             _initialGuardLocation,
@@ -81,6 +81,48 @@ class Lab
                 else
                 {
                     guardPath = [.. guardPath.SkipLast(1), guardLocation];
+                }
+            }
+        }
+    }
+
+    private bool CheckForLoop(HashSet<ObstacleLocation> obstacles)
+    {
+        var guardLocation = _initialGuardLocation;
+        var turnLocations = new HashSet<GuardLocation>();
+
+        while (true)
+        {
+            var nextLocation = guardLocation.Next();
+
+            if (nextLocation.X < 0 ||
+                nextLocation.X >= _mapSize ||
+                nextLocation.Y < 0 ||
+                nextLocation.Y >= _mapSize
+            )
+            {
+                return false;
+            }
+
+            if (!obstacles.Contains(new(nextLocation.X, nextLocation.Y)))
+            {
+                guardLocation = nextLocation;
+            }
+            else
+            {
+                var nextDirection = guardLocation.Direction == GuardDirection.Left
+                    ? GuardDirection.Up
+                    : guardLocation.Direction + 1;
+                guardLocation = new(guardLocation.X, guardLocation.Y, nextDirection);
+
+                if (turnLocations.Contains(guardLocation))
+                {
+                    // same position & direction means a loop
+                    return true;
+                }
+                else
+                {
+                    turnLocations.Add(guardLocation);
                 }
             }
         }

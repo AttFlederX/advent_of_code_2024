@@ -15,13 +15,13 @@ else
     var candidates = path!.Skip(1).ToList();
     var idx = 0;
 
-    Console.WriteLine($"Found ${candidates.Count} obstacle candidates");
+    // Console.WriteLine($"Found ${candidates.Count} obstacle candidates");
     foreach (var location in candidates)
     {
         idx++;
         if (lab.TestObstacle(new(location.X, location.Y)))
         {
-            Console.WriteLine($"Candidate #{idx} ({location.X}, {location.Y}): Valid obstacle location found");
+            // Console.WriteLine($"Candidate #{idx} ({location.X}, {location.Y}): Valid obstacle location found");
             res++;
         }
     }
