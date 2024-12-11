@@ -2,6 +2,8 @@
 var start = DateTime.Now;
 
 var fs = new FileSystem(disk);
+fs.PrintDiskMap();
+
 fs.Defragment();
 var res = fs.Checksum;
 
