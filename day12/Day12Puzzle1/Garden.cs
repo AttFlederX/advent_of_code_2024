@@ -18,53 +18,13 @@ class Garden
         {
             for (int j = 0; j < _size; j++)
             {
-                List<Plot> neighborPlots = [];
-                if (i > 0 && _plotMap[i - 1][j].Plant == _plotMap[i][j].Plant)
-                {
-                    neighborPlots.Add(_plotMap[i - 1][j]);
-                }
-                if (j > 0 && _plotMap[i][j - 1].Plant == _plotMap[i][j].Plant)
-                {
-                    neighborPlots.Add(_plotMap[i][j - 1]);
-                }
-                if (i < _size - 1 && _plotMap[i + 1][j].Plant == _plotMap[i][j].Plant)
-                {
-                    neighborPlots.Add(_plotMap[i + 1][j]);
-                }
-                if (j < _size - 1 && _plotMap[i][j + 1].Plant == _plotMap[i][j].Plant)
-                {
-                    neighborPlots.Add(_plotMap[i][j + 1]);
-                }
+                var plot = _plotMap[i][j];
+                if (plot.RegionId >= 0) continue;
 
-                var plotWithRegion = neighborPlots.FirstOrDefault(p => p.RegionId >= 0);
+                _regionMap.Add(regionId, new Region(plot.Plant));
+                FindNeighbors(plot.Plant, regionId, i, j);
 
-                if (plotWithRegion != null)
-                {
-                    if (_plotMap[i][j].RegionId != plotWithRegion.RegionId)
-                    {
-                        CopyRegionInfo(i, j, plotWithRegion);
-                    }
-
-                    foreach (var np in neighborPlots)
-                    {
-                        if (np.RegionId != plotWithRegion.RegionId)
-                        {
-                            CopyRegionInfo(np.Row, np.Col, plotWithRegion);
-                        }
-                    }
-                }
-                else
-                {
-                    if (_plotMap[i][j].RegionId < 0)
-                    {
-                        _plotMap[i][j] = _plotMap[i][j] with { RegionId = regionId };
-                        _regionMap.Add(regionId, new Region(_plotMap[i][j].Plant, [_plotMap[i][j]]));
-
-                        regionId++;
-                    }
-
-                    neighborPlots.ForEach(np => CopyRegionInfo(np.Row, np.Col, _plotMap[i][j]));
-                }
+                regionId++;
             }
         }
 
@@ -76,17 +36,37 @@ class Garden
         return _regionMap.Values.Select(r => r.Area * r.Perimeter).Sum();
     }
 
-    private void CopyRegionInfo(int toRow, int toCol, Plot from)
+    private void FindNeighbors(char plant, int regionId, int row, int col)
     {
-        _plotMap[toRow][toCol] = _plotMap[toRow][toCol] with { RegionId = from.RegionId };
-        _regionMap[_plotMap[toRow][toCol].RegionId].Plots.Add(_plotMap[toRow][toCol]);
+        var plot = _plotMap[row][col];
+        if (plot.Plant != plant || plot.RegionId == regionId) return;
+
+        _plotMap[row][col] = plot with { RegionId = regionId };
+        _regionMap[regionId].Plots.Add(_plotMap[row][col]);
+
+        if (row > 0)
+        {
+            FindNeighbors(plant, regionId, row - 1, col);
+        }
+        if (col > 0)
+        {
+            FindNeighbors(plant, regionId, row, col - 1);
+        }
+        if (row < _size - 1)
+        {
+            FindNeighbors(plant, regionId, row + 1, col);
+        }
+        if (col < _size - 1)
+        {
+            FindNeighbors(plant, regionId, row, col + 1);
+        }
     }
 }
 
-class Region(char plant, List<Plot> plots)
+class Region(char plant)
 {
     public char Plant { get; private set; } = plant;
-    public List<Plot> Plots { get; private set; } = plots;
+    public List<Plot> Plots { get; private set; } = [];
 
     public int Area => Plots.Count;
 
