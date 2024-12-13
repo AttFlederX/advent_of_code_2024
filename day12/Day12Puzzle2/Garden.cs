@@ -31,7 +31,6 @@ class Garden
         _regionMap = _regionMap.Where(r => r.Value.Area > 0).ToDictionary();
     }
 
-
     private void FindNeighbors(char plant, int regionId, int row, int col)
     {
         var plot = _plotMap[row][col];
@@ -93,25 +92,122 @@ class Region(char plant)
         get
         {
             var sides = 0;
-            var rowMap = new Dictionary<int, List<Plot>>();
-            var colMap = new Dictionary<int, List<Plot>>();
+
+            var topRowMap = new Dictionary<int, List<Plot>>();
+            var bottomRowMap = new Dictionary<int, List<Plot>>();
+            var leftColMap = new Dictionary<int, List<Plot>>();
+            var rightColMap = new Dictionary<int, List<Plot>>();
 
             foreach (var plot in Plots)
             {
-                if (!rowMap.TryAdd(plot.Row, [plot]))
+                if (!Plots.Contains(plot with { Row = plot.Row - 1 }))
                 {
-                    rowMap[plot.Row].Add(plot);
+                    if (!topRowMap.TryAdd(plot.Row, [plot]))
+                    {
+                        topRowMap[plot.Row].Add(plot);
+                    }
                 }
-                if (!colMap.TryAdd(plot.Col, [plot]))
+                if (!Plots.Contains(plot with { Row = plot.Row + 1 }))
                 {
-                    colMap[plot.Col].Add(plot);
+                    if (!bottomRowMap.TryAdd(plot.Row, [plot]))
+                    {
+                        bottomRowMap[plot.Row].Add(plot);
+                    }
+                }
+                if (!Plots.Contains(plot with { Col = plot.Col - 1 }))
+                {
+                    if (!leftColMap.TryAdd(plot.Col, [plot]))
+                    {
+                        leftColMap[plot.Col].Add(plot);
+                    }
+                }
+                if (!Plots.Contains(plot with { Col = plot.Col + 1 }))
+                {
+                    if (!rightColMap.TryAdd(plot.Col, [plot]))
+                    {
+                        rightColMap[plot.Col].Add(plot);
+                    }
                 }
             }
 
-            foreach (var row in rowMap)
+            foreach (var kv in topRowMap)
             {
-                if (row.Value.Count == 1) sides++;
-                
+                if (kv.Value.Count == 1)
+                {
+                    sides++;
+                }
+                else
+                {
+                    var sortedPlots = kv.Value.OrderBy(p => p.Col).ToList();
+                    for (int i = 0; i < sortedPlots.Count - 1; i++)
+                    {
+                        if (sortedPlots[i + 1].Col - sortedPlots[i].Col != 1)
+                        {
+                            sides++;
+                        }
+                    }
+                    sides++;
+                }
+            }
+
+            foreach (var kv in bottomRowMap)
+            {
+                if (kv.Value.Count == 1)
+                {
+                    sides++;
+                }
+                else
+                {
+                    var sortedPlots = kv.Value.OrderBy(p => p.Col).ToList();
+                    for (int i = 0; i < kv.Value.Count - 1; i++)
+                    {
+                        if (sortedPlots[i + 1].Col - sortedPlots[i].Col != 1)
+                        {
+                            sides++;
+                        }
+                    }
+                    sides++;
+                }
+            }
+
+            foreach (var kv in leftColMap)
+            {
+                if (kv.Value.Count == 1)
+                {
+                    sides++;
+                }
+                else
+                {
+                    var sortedPlots = kv.Value.OrderBy(p => p.Row).ToList();
+                    for (int i = 0; i < kv.Value.Count - 1; i++)
+                    {
+                        if (sortedPlots[i + 1].Row - sortedPlots[i].Row != 1)
+                        {
+                            sides++;
+                        }
+                    }
+                    sides++;
+                }
+            }
+
+            foreach (var kv in rightColMap)
+            {
+                if (kv.Value.Count == 1)
+                {
+                    sides++;
+                }
+                else
+                {
+                    var sortedPlots = kv.Value.OrderBy(p => p.Row).ToList();
+                    for (int i = 0; i < sortedPlots.Count - 1; i++)
+                    {
+                        if (sortedPlots[i + 1].Row - sortedPlots[i].Row != 1)
+                        {
+                            sides++;
+                        }
+                    }
+                    sides++;
+                }
             }
 
             return sides;
