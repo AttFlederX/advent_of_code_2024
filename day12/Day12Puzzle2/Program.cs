@@ -1,4 +1,4 @@
-﻿var lines = File.ReadAllLines("input.txt");
+﻿var lines = File.ReadAllLines("test1.txt");
 var start = DateTime.Now;
 
 var garden = new Garden(lines);

@@ -59,7 +59,7 @@ class Garden
     }
     public long CalculatePrice()
     {
-        return _regionMap.Values.Select(r => r.Area * r.Perimeter).Sum();
+        return _regionMap.Values.Select(r => r.Area * r.Sides).Sum();
     }
 }
 
@@ -85,6 +85,36 @@ class Region(char plant)
             }
 
             return perimeter;
+        }
+    }
+
+    public int Sides
+    {
+        get
+        {
+            var sides = 0;
+            var rowMap = new Dictionary<int, List<Plot>>();
+            var colMap = new Dictionary<int, List<Plot>>();
+
+            foreach (var plot in Plots)
+            {
+                if (!rowMap.TryAdd(plot.Row, [plot]))
+                {
+                    rowMap[plot.Row].Add(plot);
+                }
+                if (!colMap.TryAdd(plot.Col, [plot]))
+                {
+                    colMap[plot.Col].Add(plot);
+                }
+            }
+
+            foreach (var row in rowMap)
+            {
+                if (row.Value.Count == 1) sides++;
+                
+            }
+
+            return sides;
         }
     }
 }
