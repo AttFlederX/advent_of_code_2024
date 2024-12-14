@@ -1,4 +1,4 @@
-﻿var lines = File.ReadAllLines("test.txt");
+﻿var lines = File.ReadAllLines("input.txt");
 var start = DateTime.Now;
 
 List<ClawMachine> clawMachines = [];
@@ -10,5 +10,5 @@ while (lines.Length > 0)
 var res = clawMachines.Select(cm => cm.CalculateCheapestWin()).Sum();
 
 var duration = DateTime.Now - start;
-Console.WriteLine($"\nResult: {res}");
+Console.WriteLine($"\nResult: {res:F0}");
 Console.WriteLine($"Time: {duration.TotalMilliseconds} ms");
