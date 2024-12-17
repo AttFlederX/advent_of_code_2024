@@ -1,3 +1,4 @@
 {
-    "dotnet.defaultSolution": "puzzle1.sln"
+    "dotnet.defaultSolution": "puzzle1.sln",
+    "debug.console.collapseIdenticalLines": false
 }
