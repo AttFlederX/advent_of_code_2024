@@ -1,4 +1,4 @@
-﻿var lines = File.ReadAllLines("test2.txt");
+﻿var lines = File.ReadAllLines("input.txt");
 var start = DateTime.Now;
 
 var maze = new Maze(lines);
