@@ -1,3 +1,5 @@
+using Microsoft.Z3;
+
 class Cpu
 {
     enum Instruction
@@ -126,25 +128,55 @@ class Cpu
 
     public int FindQuine(string input)
     {
-        string output = "";
-        int a = 0;
+        var program = input.Replace(",", "").Select(c => c - '0').ToArray();
 
-        Console.Clear();
-
-        while (input != output)
+        using (var ctx = new Context())
         {
-            _InsPtr = 0;
-            _A = a;
+            var solver = ctx.MkOptimize();
 
-            output = RunProgram(input);
+            var s = ctx.MkBVConst("s", 64);
 
-            Console.SetCursorPosition(0, 0);
-            Console.WriteLine($"A = {a}: {output}");
+            var a = s;
+            var b = ctx.MkBV(0, 64);
+            var c = ctx.MkBV(0, 64);
 
-            a++;
+            var one = ctx.MkBV(1, 64);
+            var max = ctx.MkBV(8, 64);
+
+            foreach (var x in program)
+            {
+                // // BST A
+                // b = ctx.MkBVSMod(a, max);
+                // // BXL 1
+                // b = ctx.MkBVXOR(b, ctx.MkBV(1, 64));
+                // // CDV B
+                // c = ctx.MkBVSDiv(a, ctx.MkBVRotateLeft(b, baseTwo));
+                // // ADV 3
+                // a = ctx.MkBVSDiv(a, ctx.MkBVRotateLeft(3, baseTwo));
+                // // BXL 4
+                // b = ctx.MkBVXOR(b, ctx.MkBV(4, 64));
+                // // BXC                
+                // b = ctx.MkBVXOR(b, c);
+
+                // ADV 3
+                a = ctx.MkBVRotateRight(3, a);
+
+                solver.Add(ctx.MkEq(ctx.MkBVSMod(b, max), ctx.MkBV(x, 64)));
+            }
+
+            solver.Add(ctx.MkEq(a, ctx.MkBV(0, 64)));
+            solver.MkMinimize(s);
+
+            //if (solver.Check() == Status.SATISFIABLE)
+            //{
+            solver.Check();
+            var res = solver.Model.Eval(s);
+            //}
+
+
+            return 0;
         }
 
-        return a--;
     }
 
     private int ParseCombo(int op)

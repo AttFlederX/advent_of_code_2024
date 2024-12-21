@@ -6,7 +6,7 @@ var program = lines.Last().Split(": ").Last();
 
 cpu.Disasm(program);
 
-var res = cpu.RunProgram(program);
+var res = cpu.FindQuine(program);
 
 var duration = DateTime.Now - start;
 Console.WriteLine($"\nResult: {res}");
