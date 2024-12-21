@@ -16,16 +16,24 @@ class Ram
         }).ToArray();
     }
 
-    public int FindShortestEscapeRoute(int bytes)
+    public Address FindCutOffByte(int from = 1)
+    {
+        var byteNum = from;
+        while (HasEscapeRoute(byteNum) && byteNum <= _fallenBytes.Length)
+            byteNum++;
+
+        return _fallenBytes[byteNum - 1];
+    }
+
+    public bool HasEscapeRoute(int bytes)
     {
         return BreadthSearch(_fallenBytes.Take(bytes), new(0, 0));
     }
 
-    private int BreadthSearch(IEnumerable<Address> fallenBytes, Address from)
+    private bool BreadthSearch(IEnumerable<Address> fallenBytes, Address from)
     {
         var searchQueue = new Queue<Address>();
         List<Address> visitedAddresses = [from];
-        var parents = new Dictionary<Address, Address>();
 
         searchQueue.Enqueue(from);
 
@@ -35,7 +43,7 @@ class Ram
 
             if (address.Row == _size - 1 && address.Col == _size - 1)
             {
-                return GetPathLength(address, parents);
+                return true;
             }
 
             Address[] adjacentAddresses = [
@@ -53,34 +61,11 @@ class Ram
                     !fallenBytes.Contains(adjacentAddress))
                 {
                     visitedAddresses.Add(adjacentAddress);
-                    parents.Add(adjacentAddress, address);
                     searchQueue.Enqueue(adjacentAddress);
                 }
             }
         }
 
-        return -1;
-    }
-
-    private int GetPathLength(Address address, Dictionary<Address, Address> parents)
-    {
-        var length = 0;
-        var addr = address;
-
-        while (true)
-        {
-            length++;
-
-            if (parents.TryGetValue(addr, out var nextAddr))
-            {
-                addr = nextAddr;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        return length - 1;
+        return false;
     }
 }
