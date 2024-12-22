@@ -2,7 +2,7 @@ class TowelPicker(string patterns)
 {
     private string[] _patterns = [.. patterns.Split(", ").OrderBy(p => p.Length)];
 
-    public object FindValidCombinations(IEnumerable<string> designs)
+    public object FindAllValidCombinations(IEnumerable<string> designs)
     {
         Dictionary<string, string[]> designsMap = [];
 
@@ -12,38 +12,34 @@ class TowelPicker(string patterns)
         }
         designsMap = designsMap.Where(kv => kv.Value.Length > 0).ToDictionary();
 
-        var res = 0;
-        Dictionary<string, bool> cache = [];
+        long res = 0;
+        Dictionary<string, long> cache = [];
         foreach (var kv in designsMap)
         {
-            if (ValidateDesign(kv.Key, kv.Value, cache))
-                res++;
+            res += ValidateDesign(kv.Key, kv.Value, cache);
         }
 
         return res;
     }
 
-    private bool ValidateDesign(string design, string[] patterns, Dictionary<string, bool> cache)
+    private long ValidateDesign(string design, string[] patterns, Dictionary<string, long> cache)
     {
-        if (cache.TryGetValue(design, out var isValid))
-            return isValid;
+        if (cache.TryGetValue(design, out var validCombinations))
+            return validCombinations;
 
         if (design.Length == 0)
-            return true;
+            return 1;
 
+        long totalCombinations = 0;
         foreach (var option in patterns)
         {
             if (design.StartsWith(option) && design.Length >= option.Length)
             {
-                if (ValidateDesign(design[option.Length..], patterns, cache))
-                {
-                    cache.Add(design, true);
-                    return true;
-                }
+                totalCombinations += ValidateDesign(design[option.Length..], patterns, cache);
             }
         }
 
-        cache.Add(design, false);
-        return false;
+        cache.Add(design, totalCombinations);
+        return totalCombinations;
     }
 }
