@@ -20,15 +20,25 @@ class RaceTrack
 
     public int FindViableCheats(int threshold = 1)
     {
+        Console.Clear();
+        Console.WriteLine("Finding cheat options...");
+
         HashSet<Point> cheatOptions = [];
         var noCheatsTime = BreadthSearch(cheatOptions);
         List<int> cheatSaves = [];
 
+        Console.WriteLine($"No cheats time: {noCheatsTime} ps");
+        var idx = 0;
         foreach (var option in cheatOptions)
         {
+            Console.SetCursorPosition(0, 2);
+            Console.WriteLine($"Testing cheat #{idx}/{cheatOptions.Count}");
+
             var cheatTime = BreadthSearch(activeCheatOption: option);
             if (noCheatsTime - cheatTime >= threshold)
                 cheatSaves.Add(noCheatsTime - cheatTime);
+
+            idx++;
         }
 
         return cheatSaves.Count;
@@ -37,7 +47,7 @@ class RaceTrack
     private int BreadthSearch(HashSet<Point>? cheatOptions = null, Point? activeCheatOption = null)
     {
         var searchQueue = new Queue<Point>();
-        List<Point> visitedAddresses = [_start];
+        HashSet<Point> visitedAddresses = [_start];
         var parents = new Dictionary<Point, Point>();
 
         searchQueue.Enqueue(_start);
